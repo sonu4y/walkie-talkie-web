@@ -9,53 +9,68 @@
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
   body { padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom); display:flex; flex-direction:column; max-width:480px; margin:0 auto; }
-  h1 { font-size:20px; margin:20px 0 4px; letter-spacing:.5px; }
+  h1 { font-size:20px; margin:20px 0 4px; }
   .sub { color:var(--mut); font-size:13px; margin-bottom:18px; }
   .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .seg { display:flex; gap:6px; background:#0f1412; border:1px solid var(--line); border-radius:12px; padding:4px; }
+  .seg button { flex:1; padding:10px; border:0; border-radius:9px; background:none; color:var(--mut); font-weight:600; }
+  .seg button.on { background:var(--acc); color:#04251a; }
   label { display:block; font-size:12px; color:var(--mut); margin:12px 0 4px; }
   input { width:100%; padding:14px; border-radius:12px; border:1px solid var(--line); background:#0f1412; color:var(--txt); font-size:16px; }
   button { font:inherit; cursor:pointer; }
   .join { width:100%; margin-top:16px; padding:14px; border:0; border-radius:12px; background:var(--acc); color:#04251a; font-weight:700; font-size:16px; }
+  .join:disabled { opacity:.6; }
   #err { color:#fca5a5; font-size:13px; min-height:18px; margin-top:10px; }
+  .help { font-size:12px; color:var(--mut); margin-top:6px; }
   #app { display:none; flex:1; flex-direction:column; padding-bottom:16px; }
   .top { display:flex; justify-content:space-between; align-items:center; margin:16px 0 10px; gap:8px; }
   .top b { font-size:17px; word-break:break-all; }
   .pill { font-size:12px; padding:5px 10px; border-radius:99px; background:var(--panel); border:1px solid var(--line); color:var(--mut); white-space:nowrap; }
   .pill.on { color:var(--acc); border-color:var(--acc); }
-  .leave { background:none; border:1px solid var(--line); color:var(--mut); border-radius:10px; padding:6px 10px; font-size:12px; }
+  .small { background:none; border:1px solid var(--line); color:var(--mut); border-radius:10px; padding:6px 10px; font-size:12px; }
+  .small.danger { color:#fca5a5; border-color:#7f1d1d; }
+  .btns { display:flex; gap:6px; }
   #status { text-align:center; color:var(--mut); font-size:14px; height:22px; margin:10px 0; }
   #status.rx { color:var(--acc); font-weight:600; }
   .ptt-wrap { display:flex; justify-content:center; margin:6px 0 14px; }
-  #ptt { width:190px; height:190px; border-radius:50%; border:6px solid var(--line); background:radial-gradient(circle at 35% 30%,#2a3a33,#17211c); color:var(--txt); font-size:18px; font-weight:700; letter-spacing:1px; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .06s, border-color .1s, background .1s; }
+  #ptt { width:190px; height:190px; border-radius:50%; border:6px solid var(--line); background:radial-gradient(circle at 35% 30%,#2a3a33,#17211c); color:var(--txt); font-size:18px; font-weight:700; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .06s,border-color .1s,background .1s; }
   #ptt.tx { transform:scale(.96); border-color:var(--hot); background:radial-gradient(circle at 35% 30%,#f87171,#b91c1c); color:#fff; }
   .hint { text-align:center; font-size:12px; color:var(--mut); margin-bottom:12px; }
   #log { flex:1; min-height:80px; overflow:auto; font-size:13px; color:var(--mut); display:flex; flex-direction:column; gap:4px; padding:4px 2px; }
   #log .me { color:var(--acc); }
   .msg { display:flex; gap:8px; margin-top:8px; }
   .msg input { padding:11px; font-size:14px; }
-  .msg button { padding:0 16px; border:0; border-radius:12px; background:var(--panel); color:var(--txt); border:1px solid var(--line); }
+  .msg button { padding:0 16px; border-radius:12px; background:var(--panel); color:var(--txt); border:1px solid var(--line); }
 </style>
 </head>
 <body>
 <h1>📻 Walkie Talkie</h1>
-<div class="sub">Same group name + passcode = same channel. Works over WiFi or internet.</div>
+<div class="sub">Create a room, share the name + passcode, and talk.</div>
 
 <div id="join" class="card">
-  <label for="gc">Group name</label>
+  <div class="seg">
+    <button id="tabCreate" class="on" type="button">Create room</button>
+    <button id="tabJoin" type="button">Join room</button>
+  </div>
+  <label for="gc">Room name</label>
   <input id="gc" autocomplete="off" autocapitalize="off" placeholder="e.g. trekkers">
-  <label for="pw">Passcode</label>
+  <label for="pw">Passcode (4+ characters)</label>
   <input id="pw" type="password" autocomplete="off" placeholder="shared secret">
   <label for="nm">Your name</label>
   <input id="nm" autocomplete="off" placeholder="e.g. Vansh">
-  <button class="join" id="joinBtn">Join channel</button>
+  <button class="join" id="joinBtn">Create room</button>
   <div id="err"></div>
+  <div class="help" id="help">Pick a room name nobody has used. Share the name and passcode with your friends.</div>
 </div>
 
 <div id="app">
   <div class="top">
     <b id="gname"></b>
     <span class="pill" id="count">0 online</span>
-    <button class="leave" id="leaveBtn">Leave</button>
+    <div class="btns">
+      <button class="small danger" id="delBtn" style="display:none">Delete</button>
+      <button class="small" id="leaveBtn">Leave</button>
+    </div>
   </div>
   <div id="status">Connecting…</div>
   <div class="ptt-wrap"><button id="ptt">HOLD<br>TO TALK</button></div>
@@ -66,94 +81,202 @@
     <button>Send</button>
   </form>
 </div>
-
 <div id="audioBox"></div>
 
 <script type="module">
-import { joinRoom, selfId } from 'https://esm.run/trystero';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import { getDatabase, ref, set, get, update, push, remove, onChildAdded, onChildRemoved, onValue, onDisconnect } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+import { firebaseConfig, iceServers } from './config.js';
 
 const $ = id => document.getElementById(id);
-let room = null, micStream = null, names = {}, audioEls = {}, talking = false, rxTimers = {};
+const configured = !String(firebaseConfig.apiKey).startsWith('PASTE');
+let fbApp, auth, db;
+if (configured) { fbApp = initializeApp(firebaseConfig); auth = getAuth(fbApp); db = getDatabase(fbApp); }
 
-try {
-  $('gc').value = localStorage.getItem('wt_gc') || '';
-  $('nm').value = localStorage.getItem('wt_nm') || '';
-} catch {}
+let mode = 'create';
+let me = null, roomPath = '', micStream = null, talking = false, isOwner = false, delArmed = false;
+let peers = {};          // uid -> { pc, dc, name, audio, queued, remoteSet }
+let known = {};          // uid -> display name
+let unsubs = [];
 
-function log(text, cls) {
-  const d = document.createElement('div');
-  if (cls) d.className = cls;
-  d.textContent = text;
-  $('log').appendChild(d);
-  $('log').scrollTop = 1e9;
+try { $('gc').value = localStorage.getItem('wt_gc') || ''; $('nm').value = localStorage.getItem('wt_nm') || ''; } catch {}
+
+function setMode(m) {
+  mode = m;
+  $('tabCreate').classList.toggle('on', m === 'create');
+  $('tabJoin').classList.toggle('on', m === 'join');
+  $('joinBtn').textContent = m === 'create' ? 'Create room' : 'Join room';
+  $('help').textContent = m === 'create'
+    ? 'Pick a room name nobody has used. Share the name and passcode with your friends.'
+    : 'Enter the room name and passcode your friend shared with you.';
+  $('err').textContent = '';
 }
-function setCount() {
-  const n = Object.keys(audioEls).length + Object.keys(names).filter(k => !audioEls[k]).length;
-  const peers = Object.keys(names).length;
-  $('count').textContent = peers + ' online';
-  $('count').classList.toggle('on', peers > 0);
+$('tabCreate').onclick = () => setMode('create');
+$('tabJoin').onclick = () => setMode('join');
+
+const log = (t, c) => { const d = document.createElement('div'); if (c) d.className = c; d.textContent = t; $('log').appendChild(d); $('log').scrollTop = 1e9; };
+const setStatus = (t, rx) => { $('status').textContent = t; $('status').classList.toggle('rx', !!rx); };
+const updateCount = () => {
+  const n = Object.values(peers).filter(p => p.pc.connectionState === 'connected').length;
+  $('count').textContent = n + ' online';
+  $('count').classList.toggle('on', n > 0);
+};
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+async function sha256(s) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
 }
-function setStatus(t, rx) { $('status').textContent = t; $('status').classList.toggle('rx', !!rx); }
+const sendSignal = (to, type, data) => push(ref(db, `${roomPath}/signals/${to}`), { from: me, type, data: JSON.stringify(data) });
+
+function makePeer(uid, name, initiator) {
+  if (peers[uid]) return peers[uid];
+  const pc = new RTCPeerConnection({ iceServers });
+  const p = { pc, dc: null, name, audio: null, queued: [], remoteSet: false };
+  peers[uid] = p;
+  micStream.getTracks().forEach(t => pc.addTrack(t, micStream));
+  pc.onicecandidate = e => { if (e.candidate) sendSignal(uid, 'ice', e.candidate.toJSON()); };
+  pc.ontrack = e => {
+    if (!p.audio) { p.audio = document.createElement('audio'); p.audio.autoplay = true; p.audio.playsInline = true; $('audioBox').appendChild(p.audio); }
+    p.audio.srcObject = e.streams[0];
+    p.audio.play().catch(() => {});
+  };
+  pc.onconnectionstatechange = () => {
+    updateCount();
+    if (pc.connectionState === 'connected') log(p.name + ' connected');
+    if (pc.connectionState === 'failed') log('Connection to ' + p.name + ' failed (network may need a TURN server)');
+  };
+  const wireDC = dc => {
+    p.dc = dc;
+    dc.onmessage = e => {
+      let m; try { m = JSON.parse(e.data); } catch { return; }
+      if (m.t === 'talk') setStatus(m.on ? '🔊 ' + p.name + ' is talking' : 'Listening…', m.on);
+      if (m.t === 'chat') log(p.name + ': ' + String(m.text).slice(0, 500));
+    };
+  };
+  if (initiator) wireDC(pc.createDataChannel('wt')); else pc.ondatachannel = e => wireDC(e.channel);
+  if (initiator) {
+    pc.onnegotiationneeded = async () => {
+      await pc.setLocalDescription(await pc.createOffer());
+      sendSignal(uid, 'offer', pc.localDescription.toJSON());
+    };
+  }
+  return p;
+}
+function closePeer(uid) {
+  const p = peers[uid]; if (!p) return;
+  try { p.pc.close(); } catch {}
+  p.audio?.remove();
+  delete peers[uid];
+  updateCount();
+}
+async function handleSignal(snap) {
+  const s = snap.val();
+  remove(snap.ref);
+  if (!s || !s.from) return;
+  let data; try { data = JSON.parse(s.data); } catch { return; }
+  let p = peers[s.from];
+  const flush = async () => { for (const c of p.queued) await p.pc.addIceCandidate(c).catch(() => {}); p.queued = []; };
+  if (s.type === 'offer') {
+    p = p || makePeer(s.from, known[s.from] || 'Someone', false);
+    await p.pc.setRemoteDescription(data); p.remoteSet = true; await flush();
+    await p.pc.setLocalDescription(await p.pc.createAnswer());
+    sendSignal(s.from, 'answer', p.pc.localDescription.toJSON());
+  } else if (s.type === 'answer' && p) {
+    await p.pc.setRemoteDescription(data); p.remoteSet = true; await flush();
+  } else if (s.type === 'ice' && p) {
+    if (p.remoteSet) await p.pc.addIceCandidate(data).catch(() => {}); else p.queued.push(data);
+  }
+}
+
+function fail(msg) {
+  $('err').textContent = msg;
+  micStream?.getTracks().forEach(t => t.stop()); micStream = null;
+  $('joinBtn').disabled = false;
+}
 
 $('joinBtn').onclick = async () => {
-  const gc = $('gc').value.trim().toLowerCase();
+  const gcRaw = $('gc').value.trim();
+  const roomId = slug(gcRaw);
   const pw = $('pw').value;
-  const nm = $('nm').value.trim() || 'Anon-' + selfId.slice(0, 3);
+  const nm = ($('nm').value.trim() || 'Anon').slice(0, 24);
   $('err').textContent = '';
-  if (!gc || !pw) { $('err').textContent = 'Enter group name and passcode.'; return; }
-  if (!navigator.mediaDevices?.getUserMedia) { $('err').textContent = 'Microphone needs HTTPS. Open the site over https://'; return; }
+  if (!configured) { $('err').textContent = 'App is not configured yet (config.js).'; return; }
+  if (roomId.length < 2) { $('err').textContent = 'Room name needs at least 2 letters or numbers.'; return; }
+  if (pw.length < 4) { $('err').textContent = 'Passcode needs at least 4 characters.'; return; }
+  if (!navigator.mediaDevices?.getUserMedia) { $('err').textContent = 'Microphone needs https.'; return; }
+  $('joinBtn').disabled = true;
+
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }, video:false });
-  } catch (e) { $('err').textContent = 'Microphone permission denied.'; return; }
+  } catch { return fail('Microphone permission denied.'); }
   micStream.getAudioTracks().forEach(t => t.enabled = false);
-  try { localStorage.setItem('wt_gc', gc); localStorage.setItem('wt_nm', nm); } catch {}
 
-  room = joinRoom({ appId: 'walkie-talkie-v1', password: pw }, gc);
-  const [sendHello, getHello] = room.makeAction('hello');
-  const [sendChat, getChat] = room.makeAction('chat');
-  const [sendTalk, getTalk] = room.makeAction('talk');
-  room.sendChat = sendChat; room.sendTalk = sendTalk;
+  try { me = (await signInAnonymously(auth)).user.uid; }
+  catch (e) { return fail('Sign-in failed (' + (e.code || 'error') + '). Check Firebase setup.'); }
 
-  room.onPeerJoin(id => {
-    sendHello(nm, id);
-    room.addStream(micStream, id);
-    names[id] = 'Someone';
-    setCount();
-  });
-  room.onPeerLeave(id => {
-    log((names[id] || 'Someone') + ' left');
-    delete names[id];
-    if (audioEls[id]) { audioEls[id].remove(); delete audioEls[id]; }
-    setCount();
-  });
-  getHello((n, id) => { names[id] = String(n).slice(0, 24); log(names[id] + ' joined'); setCount(); });
-  getChat((m, id) => log((names[id] || 'Someone') + ': ' + String(m).slice(0, 500)));
-  getTalk((on, id) => {
-    if (on) setStatus('🔊 ' + (names[id] || 'Someone') + ' is talking', true);
-    else if (!document.querySelector('#status.rx') || true) setStatus('Listening…');
-  });
-  room.onPeerStream((stream, id) => {
-    let a = audioEls[id];
-    if (!a) { a = document.createElement('audio'); a.autoplay = true; a.playsInline = true; $('audioBox').appendChild(a); audioEls[id] = a; }
-    a.srcObject = stream;
-    a.play().catch(() => {});
-  });
+  roomPath = 'rooms/' + roomId;
+  const passHash = await sha256(roomId + ':' + pw);
+
+  let exists;
+  try { exists = (await get(ref(db, roomPath + '/exists'))).val() === true; }
+  catch (e) { return fail('Cannot reach the database (' + (e.code || 'error') + ').'); }
+
+  if (mode === 'create') {
+    if (exists) return fail('That room name is taken. Pick another, or use Join room.');
+    try {
+      await update(ref(db, roomPath), { meta: { passHash, owner: me, name: gcRaw.slice(0, 40), created: Date.now() }, exists: true });
+    } catch (e) { return fail('Could not create the room (' + (e.code || 'error') + ').'); }
+  } else if (!exists) {
+    return fail('Room not found. Check the name, or create it first.');
+  }
+
+  try { await set(ref(db, `${roomPath}/members/${me}`), { name: nm, proof: passHash }); }
+  catch { return fail('Wrong passcode.'); }
+
+  try { isOwner = (await get(ref(db, roomPath + '/meta/owner'))).val() === me; } catch { isOwner = false; }
+
+  try { localStorage.setItem('wt_gc', gcRaw); localStorage.setItem('wt_nm', nm); } catch {}
+
+  const myRef = ref(db, `${roomPath}/peers/${me}`);
+  onDisconnect(myRef).remove();
+
+  unsubs.push(onChildAdded(ref(db, `${roomPath}/peers`), s => {
+    const uid = s.key; if (uid === me) return;
+    const info = s.val() || {};
+    known[uid] = info.name || 'Someone';
+    if (peers[uid]) { peers[uid].name = known[uid]; return; }
+    log(known[uid] + ' joined');
+    if (me > uid) makePeer(uid, known[uid], true);   // the larger id offers, so both sides never offer at once
+  }));
+  unsubs.push(onChildRemoved(ref(db, `${roomPath}/peers`), s => { if (peers[s.key]) log(peers[s.key].name + ' left'); closePeer(s.key); }));
+  unsubs.push(onChildAdded(ref(db, `${roomPath}/signals/${me}`), handleSignal));
+  unsubs.push(onValue(ref(db, roomPath + '/exists'), s => { if (s.val() !== true && roomPath) { alert2('The room was deleted.'); leave(); } }));
+
+  await set(myRef, { name: nm, ts: Date.now() });
 
   $('join').style.display = 'none';
   $('app').style.display = 'flex';
-  $('gname').textContent = '#' + gc;
-  setStatus('Listening… (waiting for others to join)');
-  log('Joined #' + gc + ' as ' + nm, 'me');
-  history.replaceState(null, '', location.pathname);
+  $('gname').textContent = '#' + roomId;
+  $('delBtn').style.display = isOwner ? 'inline-block' : 'none';
+  $('joinBtn').disabled = false;
+  setStatus('Listening…');
+  log((mode === 'create' ? 'Created #' : 'Joined #') + roomId + ' as ' + nm, 'me');
+  if (mode === 'create') log('Share the room name and passcode with your friends.');
 };
+const alert2 = t => { $('err').textContent = t; };
 
+function broadcast(obj) {
+  const s = JSON.stringify(obj);
+  Object.values(peers).forEach(p => { if (p.dc?.readyState === 'open') p.dc.send(s); });
+}
 function talk(on) {
   if (!micStream || talking === on) return;
   talking = on;
   micStream.getAudioTracks().forEach(t => t.enabled = on);
   $('ptt').classList.toggle('tx', on);
   $('ptt').innerHTML = on ? 'TALKING…' : 'HOLD<br>TO TALK';
-  room?.sendTalk(on);
+  broadcast({ t: 'talk', on });
   setStatus(on ? '🎙️ You are talking' : 'Listening…');
   if (on && navigator.vibrate) navigator.vibrate(20);
 }
@@ -167,22 +290,33 @@ addEventListener('blur', () => talk(false));
 
 $('msgForm').onsubmit = e => {
   e.preventDefault();
-  const v = $('msgIn').value.trim();
-  if (!v || !room) return;
-  room.sendChat(v);
+  const v = $('msgIn').value.trim(); if (!v) return;
+  broadcast({ t: 'chat', text: v });
   log('You: ' + v, 'me');
   $('msgIn').value = '';
 };
-$('leaveBtn').onclick = () => {
+
+async function leave() {
   talk(false);
-  room?.leave(); room = null;
+  const path = roomPath, uid = me;
+  roomPath = '';
+  unsubs.forEach(u => { try { u(); } catch {} }); unsubs = [];
+  Object.keys(peers).forEach(closePeer);
+  if (path && uid) await remove(ref(db, `${path}/peers/${uid}`)).catch(() => {});
   micStream?.getTracks().forEach(t => t.stop()); micStream = null;
-  Object.values(audioEls).forEach(a => a.remove());
-  audioEls = {}; names = {};
+  known = {}; isOwner = false; delArmed = false;
+  $('delBtn').textContent = 'Delete';
   $('log').innerHTML = '';
   $('app').style.display = 'none';
   $('join').style.display = 'block';
+  $('joinBtn').disabled = false;
+}
+$('leaveBtn').onclick = leave;
+$('delBtn').onclick = async () => {
+  if (!delArmed) { delArmed = true; $('delBtn').textContent = 'Tap again to delete room'; setTimeout(() => { delArmed = false; $('delBtn').textContent = 'Delete'; }, 4000); return; }
+  try { await remove(ref(db, roomPath)); } catch { log('Could not delete the room.'); }
 };
+addEventListener('pagehide', () => { if (roomPath && me) remove(ref(db, `${roomPath}/peers/${me}`)); });
 </script>
 </body>
 </html>

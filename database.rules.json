@@ -1,0 +1,42 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$room": {
+        ".write": "auth != null && !newData.exists() && data.child('meta/owner').val() === auth.uid",
+        "exists": {
+          ".read": "auth != null",
+          ".write": "auth != null && !data.exists() && newData.val() === true"
+        },
+        "meta": {
+          ".read": "auth != null && root.child('rooms/' + $room + '/members/' + auth.uid).exists()",
+          ".write": "auth != null && !data.exists()",
+          ".validate": "newData.hasChildren(['passHash','owner','name','created']) && newData.child('owner').val() === auth.uid"
+        },
+        "members": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && newData.child('proof').val() === root.child('rooms/' + $room + '/meta/passHash').val()",
+            ".validate": "newData.hasChildren(['name','proof']) && newData.child('name').isString() && newData.child('name').val().length <= 24"
+          }
+        },
+        "peers": {
+          ".read": "auth != null && root.child('rooms/' + $room + '/members/' + auth.uid).exists()",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('rooms/' + $room + '/members/' + auth.uid).exists()",
+            ".validate": "newData.hasChildren(['name','ts'])"
+          }
+        },
+        "signals": {
+          "$to": {
+            ".read": "auth != null && auth.uid === $to",
+            "$msg": {
+              ".write": "auth != null && root.child('rooms/' + $room + '/members/' + auth.uid).exists() && (newData.exists() ? newData.child('from').val() === auth.uid : auth.uid === $to)",
+              ".validate": "newData.hasChildren(['from','type','data'])"
+            }
+          }
+        }
+      }
+    }
+  }
+}
