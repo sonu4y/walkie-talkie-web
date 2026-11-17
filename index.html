@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Walkie Talkie</title>
+<style>
+  :root { --bg:#0f1412; --panel:#18211d; --line:#26332d; --txt:#e8f1ec; --mut:#8fa399; --acc:#34d399; --hot:#ef4444; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  body { padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom); display:flex; flex-direction:column; max-width:480px; margin:0 auto; }
+  h1 { font-size:20px; margin:20px 0 4px; letter-spacing:.5px; }
+  .sub { color:var(--mut); font-size:13px; margin-bottom:18px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  label { display:block; font-size:12px; color:var(--mut); margin:12px 0 4px; }
+  input { width:100%; padding:14px; border-radius:12px; border:1px solid var(--line); background:#0f1412; color:var(--txt); font-size:16px; }
+  button { font:inherit; cursor:pointer; }
+  .join { width:100%; margin-top:16px; padding:14px; border:0; border-radius:12px; background:var(--acc); color:#04251a; font-weight:700; font-size:16px; }
+  #err { color:#fca5a5; font-size:13px; min-height:18px; margin-top:10px; }
+  #app { display:none; flex:1; flex-direction:column; padding-bottom:16px; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin:16px 0 10px; gap:8px; }
+  .top b { font-size:17px; word-break:break-all; }
+  .pill { font-size:12px; padding:5px 10px; border-radius:99px; background:var(--panel); border:1px solid var(--line); color:var(--mut); white-space:nowrap; }
+  .pill.on { color:var(--acc); border-color:var(--acc); }
+  .leave { background:none; border:1px solid var(--line); color:var(--mut); border-radius:10px; padding:6px 10px; font-size:12px; }
+  #status { text-align:center; color:var(--mut); font-size:14px; height:22px; margin:10px 0; }
+  #status.rx { color:var(--acc); font-weight:600; }
+  .ptt-wrap { display:flex; justify-content:center; margin:6px 0 14px; }
+  #ptt { width:190px; height:190px; border-radius:50%; border:6px solid var(--line); background:radial-gradient(circle at 35% 30%,#2a3a33,#17211c); color:var(--txt); font-size:18px; font-weight:700; letter-spacing:1px; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .06s, border-color .1s, background .1s; }
+  #ptt.tx { transform:scale(.96); border-color:var(--hot); background:radial-gradient(circle at 35% 30%,#f87171,#b91c1c); color:#fff; }
+  .hint { text-align:center; font-size:12px; color:var(--mut); margin-bottom:12px; }
+  #log { flex:1; min-height:80px; overflow:auto; font-size:13px; color:var(--mut); display:flex; flex-direction:column; gap:4px; padding:4px 2px; }
+  #log .me { color:var(--acc); }
+  .msg { display:flex; gap:8px; margin-top:8px; }
+  .msg input { padding:11px; font-size:14px; }
+  .msg button { padding:0 16px; border:0; border-radius:12px; background:var(--panel); color:var(--txt); border:1px solid var(--line); }
+</style>
+</head>
+<body>
+<h1>📻 Walkie Talkie</h1>
+<div class="sub">Same group name + passcode = same channel. Works over WiFi or internet.</div>
+
+<div id="join" class="card">
+  <label for="gc">Group name</label>
+  <input id="gc" autocomplete="off" autocapitalize="off" placeholder="e.g. trekkers">
+  <label for="pw">Passcode</label>
+  <input id="pw" type="password" autocomplete="off" placeholder="shared secret">
+  <label for="nm">Your name</label>
+  <input id="nm" autocomplete="off" placeholder="e.g. Vansh">
+  <button class="join" id="joinBtn">Join channel</button>
+  <div id="err"></div>
+</div>
+
+<div id="app">
+  <div class="top">
+    <b id="gname"></b>
+    <span class="pill" id="count">0 online</span>
+    <button class="leave" id="leaveBtn">Leave</button>
+  </div>
+  <div id="status">Connecting…</div>
+  <div class="ptt-wrap"><button id="ptt">HOLD<br>TO TALK</button></div>
+  <div class="hint">Hold the button (or Space) to talk. Release to listen.</div>
+  <div id="log"></div>
+  <form class="msg" id="msgForm">
+    <input id="msgIn" placeholder="Type a message" autocomplete="off">
+    <button>Send</button>
+  </form>
+</div>
+
+<div id="audioBox"></div>
+
+<script type="module">
+import { joinRoom, selfId } from 'https://esm.run/trystero';
+
+const $ = id => document.getElementById(id);
+let room = null, micStream = null, names = {}, audioEls = {}, talking = false, rxTimers = {};
+
+try {
+  $('gc').value = localStorage.getItem('wt_gc') || '';
+  $('nm').value = localStorage.getItem('wt_nm') || '';
+} catch {}
+
+function log(text, cls) {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = text;
+  $('log').appendChild(d);
+  $('log').scrollTop = 1e9;
+}
+function setCount() {
+  const n = Object.keys(audioEls).length + Object.keys(names).filter(k => !audioEls[k]).length;
+  const peers = Object.keys(names).length;
+  $('count').textContent = peers + ' online';
+  $('count').classList.toggle('on', peers > 0);
+}
+function setStatus(t, rx) { $('status').textContent = t; $('status').classList.toggle('rx', !!rx); }
+
+$('joinBtn').onclick = async () => {
+  const gc = $('gc').value.trim().toLowerCase();
+  const pw = $('pw').value;
+  const nm = $('nm').value.trim() || 'Anon-' + selfId.slice(0, 3);
+  $('err').textContent = '';
+  if (!gc || !pw) { $('err').textContent = 'Enter group name and passcode.'; return; }
+  if (!navigator.mediaDevices?.getUserMedia) { $('err').textContent = 'Microphone needs HTTPS. Open the site over https://'; return; }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }, video:false });
+  } catch (e) { $('err').textContent = 'Microphone permission denied.'; return; }
+  micStream.getAudioTracks().forEach(t => t.enabled = false);
+  try { localStorage.setItem('wt_gc', gc); localStorage.setItem('wt_nm', nm); } catch {}
+
+  room = joinRoom({ appId: 'walkie-talkie-v1', password: pw }, gc);
+  const [sendHello, getHello] = room.makeAction('hello');
+  const [sendChat, getChat] = room.makeAction('chat');
+  const [sendTalk, getTalk] = room.makeAction('talk');
+  room.sendChat = sendChat; room.sendTalk = sendTalk;
+
+  room.onPeerJoin(id => {
+    sendHello(nm, id);
+    room.addStream(micStream, id);
+    names[id] = 'Someone';
+    setCount();
+  });
+  room.onPeerLeave(id => {
+    log((names[id] || 'Someone') + ' left');
+    delete names[id];
+    if (audioEls[id]) { audioEls[id].remove(); delete audioEls[id]; }
+    setCount();
+  });
+  getHello((n, id) => { names[id] = String(n).slice(0, 24); log(names[id] + ' joined'); setCount(); });
+  getChat((m, id) => log((names[id] || 'Someone') + ': ' + String(m).slice(0, 500)));
+  getTalk((on, id) => {
+    if (on) setStatus('🔊 ' + (names[id] || 'Someone') + ' is talking', true);
+    else if (!document.querySelector('#status.rx') || true) setStatus('Listening…');
+  });
+  room.onPeerStream((stream, id) => {
+    let a = audioEls[id];
+    if (!a) { a = document.createElement('audio'); a.autoplay = true; a.playsInline = true; $('audioBox').appendChild(a); audioEls[id] = a; }
+    a.srcObject = stream;
+    a.play().catch(() => {});
+  });
+
+  $('join').style.display = 'none';
+  $('app').style.display = 'flex';
+  $('gname').textContent = '#' + gc;
+  setStatus('Listening… (waiting for others to join)');
+  log('Joined #' + gc + ' as ' + nm, 'me');
+  history.replaceState(null, '', location.pathname);
+};
+
+function talk(on) {
+  if (!micStream || talking === on) return;
+  talking = on;
+  micStream.getAudioTracks().forEach(t => t.enabled = on);
+  $('ptt').classList.toggle('tx', on);
+  $('ptt').innerHTML = on ? 'TALKING…' : 'HOLD<br>TO TALK';
+  room?.sendTalk(on);
+  setStatus(on ? '🎙️ You are talking' : 'Listening…');
+  if (on && navigator.vibrate) navigator.vibrate(20);
+}
+const ptt = $('ptt');
+ptt.addEventListener('pointerdown', e => { e.preventDefault(); ptt.setPointerCapture(e.pointerId); talk(true); });
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => ptt.addEventListener(ev, () => talk(false)));
+ptt.addEventListener('contextmenu', e => e.preventDefault());
+addEventListener('keydown', e => { if (e.code === 'Space' && $('app').style.display === 'flex' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); if (!e.repeat) talk(true); } });
+addEventListener('keyup', e => { if (e.code === 'Space') talk(false); });
+addEventListener('blur', () => talk(false));
+
+$('msgForm').onsubmit = e => {
+  e.preventDefault();
+  const v = $('msgIn').value.trim();
+  if (!v || !room) return;
+  room.sendChat(v);
+  log('You: ' + v, 'me');
+  $('msgIn').value = '';
+};
+$('leaveBtn').onclick = () => {
+  talk(false);
+  room?.leave(); room = null;
+  micStream?.getTracks().forEach(t => t.stop()); micStream = null;
+  Object.values(audioEls).forEach(a => a.remove());
+  audioEls = {}; names = {};
+  $('log').innerHTML = '';
+  $('app').style.display = 'none';
+  $('join').style.display = 'block';
+};
+</script>
+</body>
+</html>
