@@ -16,36 +16,47 @@
   .seg button { flex:1; padding:10px; border:0; border-radius:9px; background:none; color:var(--mut); font-weight:600; }
   .seg button.on { background:var(--acc); color:#04251a; }
   label { display:block; font-size:12px; color:var(--mut); margin:12px 0 4px; }
-  input { width:100%; padding:14px; border-radius:12px; border:1px solid var(--line); background:#0f1412; color:var(--txt); font-size:16px; }
-  button { font:inherit; cursor:pointer; }
+  input[type=text], input[type=password], input:not([type]) { width:100%; padding:14px; border-radius:12px; border:1px solid var(--line); background:#0f1412; color:var(--txt); font-size:16px; }
+  button { font:inherit; cursor:pointer; color:inherit; }
   .join { width:100%; margin-top:16px; padding:14px; border:0; border-radius:12px; background:var(--acc); color:#04251a; font-weight:700; font-size:16px; }
   .join:disabled { opacity:.6; }
   #err { color:#fca5a5; font-size:13px; min-height:18px; margin-top:10px; }
   .help { font-size:12px; color:var(--mut); margin-top:6px; }
-  #app { display:none; flex:1; flex-direction:column; padding-bottom:16px; }
-  .top { display:flex; justify-content:space-between; align-items:center; margin:16px 0 10px; gap:8px; }
+  #app { display:none; flex:1; flex-direction:column; min-height:0; padding-bottom:12px; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin:14px 0 8px; gap:8px; }
   .top b { font-size:17px; word-break:break-all; }
   .pill { font-size:12px; padding:5px 10px; border-radius:99px; background:var(--panel); border:1px solid var(--line); color:var(--mut); white-space:nowrap; }
   .pill.on { color:var(--acc); border-color:var(--acc); }
   .small { background:none; border:1px solid var(--line); color:var(--mut); border-radius:10px; padding:6px 10px; font-size:12px; }
   .small.danger { color:#fca5a5; border-color:#7f1d1d; }
-  .btns { display:flex; gap:6px; }
-  #status { text-align:center; color:var(--mut); font-size:14px; height:22px; margin:10px 0; }
-  #status.rx { color:var(--acc); font-weight:600; }
-  .ptt-wrap { display:flex; justify-content:center; margin:6px 0 14px; }
-  #ptt { width:190px; height:190px; border-radius:50%; border:6px solid var(--line); background:radial-gradient(circle at 35% 30%,#2a3a33,#17211c); color:var(--txt); font-size:18px; font-weight:700; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .06s,border-color .1s,background .1s; }
-  #ptt.tx { transform:scale(.96); border-color:var(--hot); background:radial-gradient(circle at 35% 30%,#f87171,#b91c1c); color:#fff; }
-  .hint { text-align:center; font-size:12px; color:var(--mut); margin-bottom:12px; }
-  #log { flex:1; min-height:80px; overflow:auto; font-size:13px; color:var(--mut); display:flex; flex-direction:column; gap:4px; padding:4px 2px; }
+  #roster { display:flex; flex-direction:column; gap:8px; max-height:38vh; overflow:auto; }
+  .row { display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px 12px; }
+  .row.speak { border-color:var(--acc); box-shadow:0 0 0 1px var(--acc) inset; }
+  .av { width:36px; height:36px; border-radius:50%; background:#22312a; display:flex; align-items:center; justify-content:center; font-weight:700; flex:none; }
+  .row.speak .av { background:var(--acc); color:#04251a; }
+  .nm { flex:1; min-width:0; }
+  .nm .n { font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .nm .s { font-size:11px; color:var(--mut); }
+  .row input[type=range] { width:90px; }
+  .ico { width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:none; font-size:16px; flex:none; }
+  .ico.off { background:#3a1717; border-color:#7f1d1d; }
+  .empty { color:var(--mut); font-size:13px; text-align:center; padding:14px 0; }
+  #log { flex:1; min-height:60px; overflow:auto; font-size:13px; color:var(--mut); display:flex; flex-direction:column; gap:4px; padding:8px 2px; }
   #log .me { color:var(--acc); }
-  .msg { display:flex; gap:8px; margin-top:8px; }
+  .msg { display:flex; gap:8px; margin-top:4px; }
   .msg input { padding:11px; font-size:14px; }
-  .msg button { padding:0 16px; border-radius:12px; background:var(--panel); color:var(--txt); border:1px solid var(--line); }
+  .msg button { padding:0 16px; border-radius:12px; background:var(--panel); border:1px solid var(--line); }
+  .vol { display:flex; align-items:center; gap:10px; margin:10px 0 6px; font-size:12px; color:var(--mut); }
+  .vol input { flex:1; }
+  .bar { display:flex; gap:10px; margin-top:8px; }
+  .bar button { flex:1; padding:14px 6px; border-radius:14px; border:1px solid var(--line); background:var(--panel); font-weight:600; font-size:14px; }
+  .bar button.off { background:#3a1717; border-color:#7f1d1d; color:#fecaca; }
+  .bar button.leave { background:var(--hot); border-color:var(--hot); color:#fff; }
 </style>
 </head>
 <body>
-<h1>📻 Walkie Talkie</h1>
-<div class="sub">Create a room, share the name + passcode, and talk.</div>
+<h1>🎧 Private Voice Room</h1>
+<div class="sub">Create a room, share the name + passcode, and talk. Mic is always open, like a call.</div>
 
 <div id="join" class="card">
   <div class="seg">
@@ -60,28 +71,29 @@
   <input id="nm" autocomplete="off" placeholder="e.g. Vansh">
   <button class="join" id="joinBtn">Create room</button>
   <div id="err"></div>
-  <div class="help" id="help">Pick a room name nobody has used. Share the name and passcode with your friends.</div>
+  <div class="help" id="help">Pick a room name nobody has used. Share the name and passcode with your friends. Use headphones to avoid echo.</div>
 </div>
 
 <div id="app">
   <div class="top">
     <b id="gname"></b>
     <span class="pill" id="count">0 online</span>
-    <div class="btns">
-      <button class="small danger" id="delBtn" style="display:none">Delete</button>
-      <button class="small" id="leaveBtn">Leave</button>
-    </div>
+    <button class="small danger" id="delBtn" style="display:none">Delete</button>
   </div>
-  <div id="status">Connecting…</div>
-  <div class="ptt-wrap"><button id="ptt">HOLD<br>TO TALK</button></div>
-  <div class="hint">Hold the button (or Space) to talk. Release to listen.</div>
+  <div id="roster"></div>
   <div id="log"></div>
   <form class="msg" id="msgForm">
     <input id="msgIn" placeholder="Type a message" autocomplete="off">
     <button>Send</button>
   </form>
+  <div class="vol"><span>🔊 Volume</span><input id="master" type="range" min="0" max="200" value="100"><span id="masterVal">100%</span></div>
+  <div class="bar">
+    <button id="muteBtn">🎙️ Mute</button>
+    <button id="deafBtn">🔊 Deafen</button>
+    <button id="leaveBtn" class="leave">Leave</button>
+  </div>
 </div>
-<div id="audioBox"></div>
+<div id="audioBox" style="display:none"></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
@@ -95,10 +107,12 @@ let fbApp, auth, db;
 if (configured) { fbApp = initializeApp(firebaseConfig); auth = getAuth(fbApp); db = getDatabase(fbApp); }
 
 let mode = 'create';
-let me = null, roomPath = '', micStream = null, talking = false, isOwner = false, delArmed = false;
-let peers = {};          // uid -> { pc, dc, name, audio, queued, remoteSet }
+let me = null, myName = '', roomPath = '', micStream = null, isOwner = false, delArmed = false;
+let muted = false, deafened = false, mutedBeforeDeaf = false, masterVol = 1;
+let peers = {};          // uid -> { pc, dc, name, audio, src, gain, analyser, vol, localMuted, remoteMuted, queued, remoteSet }
 let known = {};          // uid -> display name
 let unsubs = [];
+let actx = null, master = null, myAnalyser = null, wake = null, meter = null;
 
 try { $('gc').value = localStorage.getItem('wt_gc') || ''; $('nm').value = localStorage.getItem('wt_nm') || ''; } catch {}
 
@@ -108,20 +122,14 @@ function setMode(m) {
   $('tabJoin').classList.toggle('on', m === 'join');
   $('joinBtn').textContent = m === 'create' ? 'Create room' : 'Join room';
   $('help').textContent = m === 'create'
-    ? 'Pick a room name nobody has used. Share the name and passcode with your friends.'
-    : 'Enter the room name and passcode your friend shared with you.';
+    ? 'Pick a room name nobody has used. Share the name and passcode with your friends. Use headphones to avoid echo.'
+    : 'Enter the room name and passcode your friend shared with you. Use headphones to avoid echo.';
   $('err').textContent = '';
 }
 $('tabCreate').onclick = () => setMode('create');
 $('tabJoin').onclick = () => setMode('join');
 
 const log = (t, c) => { const d = document.createElement('div'); if (c) d.className = c; d.textContent = t; $('log').appendChild(d); $('log').scrollTop = 1e9; };
-const setStatus = (t, rx) => { $('status').textContent = t; $('status').classList.toggle('rx', !!rx); };
-const updateCount = () => {
-  const n = Object.values(peers).filter(p => p.pc.connectionState === 'connected').length;
-  $('count').textContent = n + ' online';
-  $('count').classList.toggle('on', n > 0);
-};
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
 async function sha256(s) {
   const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -129,28 +137,88 @@ async function sha256(s) {
 }
 const sendSignal = (to, type, data) => push(ref(db, `${roomPath}/signals/${to}`), { from: me, type, data: JSON.stringify(data) });
 
+/* ---------- roster UI ---------- */
+function applyGain(p) { if (p.gain) p.gain.gain.value = p.localMuted ? 0 : p.vol; }
+function applyMaster() { if (master) master.gain.value = deafened ? 0 : masterVol; }
+function updateCount() {
+  const n = Object.values(peers).filter(p => p.pc.connectionState === 'connected').length;
+  $('count').textContent = (n + 1) + ' in call';
+  $('count').classList.toggle('on', n > 0);
+}
+function renderRoster() {
+  const box = $('roster');
+  box.innerHTML = '';
+  const mk = (uid, name, status, isMe, p) => {
+    const row = document.createElement('div');
+    row.className = 'row'; row.dataset.uid = uid;
+    const av = document.createElement('div'); av.className = 'av'; av.textContent = (name[0] || '?').toUpperCase();
+    const nm = document.createElement('div'); nm.className = 'nm';
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = name + (isMe ? ' (you)' : '');
+    const st = document.createElement('div'); st.className = 's'; st.textContent = status;
+    nm.append(n, st);
+    row.append(av, nm);
+    if (!isMe && p) {
+      const sl = document.createElement('input'); sl.type = 'range'; sl.min = 0; sl.max = 200; sl.value = Math.round(p.vol * 100);
+      sl.oninput = () => { p.vol = sl.value / 100; applyGain(p); };
+      const mb = document.createElement('button'); mb.className = 'ico' + (p.localMuted ? ' off' : ''); mb.textContent = p.localMuted ? '🔇' : '🔈';
+      mb.title = 'Mute this person for you';
+      mb.onclick = () => { p.localMuted = !p.localMuted; applyGain(p); renderRoster(); };
+      row.append(sl, mb);
+    }
+    box.appendChild(row);
+  };
+  mk(me, myName, muted ? 'Muted' : 'Mic on', true);
+  const ids = Object.keys(peers);
+  ids.forEach(uid => {
+    const p = peers[uid];
+    const connected = p.pc.connectionState === 'connected';
+    mk(uid, p.name, !connected ? 'Connecting…' : (p.remoteMuted ? 'Muted' : 'Mic on'), false, p);
+  });
+  if (!ids.length) { const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'Waiting for others to join…'; box.appendChild(e); }
+  updateCount();
+}
+function startMeter() {
+  const buf = new Uint8Array(256);
+  const level = a => { a.getByteTimeDomainData(buf); let sum = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; } return Math.sqrt(sum / buf.length); };
+  meter = setInterval(() => {
+    const set = (uid, on) => { const r = $('roster').querySelector(`[data-uid="${uid}"]`); if (r) r.classList.toggle('speak', on); };
+    if (myAnalyser && me) set(me, !muted && level(myAnalyser) > 0.03);
+    Object.keys(peers).forEach(uid => { const p = peers[uid]; if (p.analyser) set(uid, !p.remoteMuted && level(p.analyser) > 0.03); });
+  }, 150);
+}
+
+/* ---------- WebRTC ---------- */
 function makePeer(uid, name, initiator) {
   if (peers[uid]) return peers[uid];
   const pc = new RTCPeerConnection({ iceServers });
-  const p = { pc, dc: null, name, audio: null, queued: [], remoteSet: false };
+  const p = { pc, dc: null, name, audio: null, src: null, gain: null, analyser: null, vol: 1, localMuted: false, remoteMuted: false, queued: [], remoteSet: false };
   peers[uid] = p;
   micStream.getTracks().forEach(t => pc.addTrack(t, micStream));
   pc.onicecandidate = e => { if (e.candidate) sendSignal(uid, 'ice', e.candidate.toJSON()); };
   pc.ontrack = e => {
-    if (!p.audio) { p.audio = document.createElement('audio'); p.audio.autoplay = true; p.audio.playsInline = true; $('audioBox').appendChild(p.audio); }
-    p.audio.srcObject = e.streams[0];
-    p.audio.play().catch(() => {});
+    if (p.src) return;
+    const stream = e.streams[0];
+    // Keep the stream alive in an element (needed by Chrome), but play it through WebAudio so we control volume.
+    p.audio = new Audio(); p.audio.muted = true; p.audio.srcObject = stream; p.audio.play().catch(() => {});
+    $('audioBox').appendChild(p.audio);
+    p.src = actx.createMediaStreamSource(stream);
+    p.gain = actx.createGain();
+    p.analyser = actx.createAnalyser(); p.analyser.fftSize = 256;
+    p.src.connect(p.analyser);
+    p.src.connect(p.gain); p.gain.connect(master);
+    applyGain(p);
   };
   pc.onconnectionstatechange = () => {
-    updateCount();
+    renderRoster();
     if (pc.connectionState === 'connected') log(p.name + ' connected');
     if (pc.connectionState === 'failed') log('Connection to ' + p.name + ' failed (network may need a TURN server)');
   };
   const wireDC = dc => {
     p.dc = dc;
+    dc.onopen = () => dc.send(JSON.stringify({ t: 'mute', on: muted }));
     dc.onmessage = e => {
       let m; try { m = JSON.parse(e.data); } catch { return; }
-      if (m.t === 'talk') setStatus(m.on ? '🔊 ' + p.name + ' is talking' : 'Listening…', m.on);
+      if (m.t === 'mute') { p.remoteMuted = !!m.on; renderRoster(); }
       if (m.t === 'chat') log(p.name + ': ' + String(m.text).slice(0, 500));
     };
   };
@@ -161,14 +229,16 @@ function makePeer(uid, name, initiator) {
       sendSignal(uid, 'offer', pc.localDescription.toJSON());
     };
   }
+  renderRoster();
   return p;
 }
 function closePeer(uid) {
   const p = peers[uid]; if (!p) return;
   try { p.pc.close(); } catch {}
+  try { p.src?.disconnect(); p.gain?.disconnect(); } catch {}
   p.audio?.remove();
   delete peers[uid];
-  updateCount();
+  renderRoster();
 }
 async function handleSignal(snap) {
   const s = snap.val();
@@ -189,9 +259,11 @@ async function handleSignal(snap) {
   }
 }
 
+/* ---------- join / create ---------- */
 function fail(msg) {
   $('err').textContent = msg;
   micStream?.getTracks().forEach(t => t.stop()); micStream = null;
+  try { actx?.close(); } catch {} actx = null;
   $('joinBtn').disabled = false;
 }
 
@@ -207,10 +279,14 @@ $('joinBtn').onclick = async () => {
   if (!navigator.mediaDevices?.getUserMedia) { $('err').textContent = 'Microphone needs https.'; return; }
   $('joinBtn').disabled = true;
 
+  // Create the audio engine inside the tap so phones allow playback.
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  actx.resume().catch(() => {});
+  master = actx.createGain(); master.connect(actx.destination);
+
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }, video:false });
   } catch { return fail('Microphone permission denied.'); }
-  micStream.getAudioTracks().forEach(t => t.enabled = false);
 
   try { me = (await signInAnonymously(auth)).user.uid; }
   catch (e) { return fail('Sign-in failed (' + (e.code || 'error') + '). Check Firebase setup.'); }
@@ -235,8 +311,13 @@ $('joinBtn').onclick = async () => {
   catch { return fail('Wrong passcode.'); }
 
   try { isOwner = (await get(ref(db, roomPath + '/meta/owner'))).val() === me; } catch { isOwner = false; }
-
   try { localStorage.setItem('wt_gc', gcRaw); localStorage.setItem('wt_nm', nm); } catch {}
+
+  myName = nm; muted = false; deafened = false; masterVol = 1;
+  $('master').value = 100; $('masterVal').textContent = '100%';
+  applyMaster(); syncButtons();
+  myAnalyser = actx.createAnalyser(); myAnalyser.fftSize = 256;
+  actx.createMediaStreamSource(micStream).connect(myAnalyser);
 
   const myRef = ref(db, `${roomPath}/peers/${me}`);
   onDisconnect(myRef).remove();
@@ -245,13 +326,13 @@ $('joinBtn').onclick = async () => {
     const uid = s.key; if (uid === me) return;
     const info = s.val() || {};
     known[uid] = info.name || 'Someone';
-    if (peers[uid]) { peers[uid].name = known[uid]; return; }
+    if (peers[uid]) { peers[uid].name = known[uid]; renderRoster(); return; }
     log(known[uid] + ' joined');
     if (me > uid) makePeer(uid, known[uid], true);   // the larger id offers, so both sides never offer at once
   }));
   unsubs.push(onChildRemoved(ref(db, `${roomPath}/peers`), s => { if (peers[s.key]) log(peers[s.key].name + ' left'); closePeer(s.key); }));
   unsubs.push(onChildAdded(ref(db, `${roomPath}/signals/${me}`), handleSignal));
-  unsubs.push(onValue(ref(db, roomPath + '/exists'), s => { if (s.val() !== true && roomPath) { alert2('The room was deleted.'); leave(); } }));
+  unsubs.push(onValue(ref(db, roomPath + '/exists'), s => { if (s.val() !== true && roomPath) { $('err').textContent = 'The room was deleted.'; leave(); } }));
 
   await set(myRef, { name: nm, ts: Date.now() });
 
@@ -260,34 +341,38 @@ $('joinBtn').onclick = async () => {
   $('gname').textContent = '#' + roomId;
   $('delBtn').style.display = isOwner ? 'inline-block' : 'none';
   $('joinBtn').disabled = false;
-  setStatus('Listening…');
-  log((mode === 'create' ? 'Created #' : 'Joined #') + roomId + ' as ' + nm, 'me');
+  renderRoster(); startMeter();
+  log((mode === 'create' ? 'Created #' : 'Joined #') + roomId + '. Your mic is on.', 'me');
   if (mode === 'create') log('Share the room name and passcode with your friends.');
+  try { wake = await navigator.wakeLock?.request('screen'); } catch {}
 };
-const alert2 = t => { $('err').textContent = t; };
 
+/* ---------- controls ---------- */
 function broadcast(obj) {
   const s = JSON.stringify(obj);
   Object.values(peers).forEach(p => { if (p.dc?.readyState === 'open') p.dc.send(s); });
 }
-function talk(on) {
-  if (!micStream || talking === on) return;
-  talking = on;
-  micStream.getAudioTracks().forEach(t => t.enabled = on);
-  $('ptt').classList.toggle('tx', on);
-  $('ptt').innerHTML = on ? 'TALKING…' : 'HOLD<br>TO TALK';
-  broadcast({ t: 'talk', on });
-  setStatus(on ? '🎙️ You are talking' : 'Listening…');
-  if (on && navigator.vibrate) navigator.vibrate(20);
+function syncButtons() {
+  $('muteBtn').classList.toggle('off', muted);
+  $('muteBtn').textContent = muted ? '🔇 Unmute' : '🎙️ Mute';
+  $('deafBtn').classList.toggle('off', deafened);
+  $('deafBtn').textContent = deafened ? '🔇 Undeafen' : '🔊 Deafen';
 }
-const ptt = $('ptt');
-ptt.addEventListener('pointerdown', e => { e.preventDefault(); ptt.setPointerCapture(e.pointerId); talk(true); });
-['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => ptt.addEventListener(ev, () => talk(false)));
-ptt.addEventListener('contextmenu', e => e.preventDefault());
-addEventListener('keydown', e => { if (e.code === 'Space' && $('app').style.display === 'flex' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); if (!e.repeat) talk(true); } });
-addEventListener('keyup', e => { if (e.code === 'Space') talk(false); });
-addEventListener('blur', () => talk(false));
-
+function setMuted(on) {
+  muted = on;
+  micStream?.getAudioTracks().forEach(t => t.enabled = !on);
+  broadcast({ t: 'mute', on });
+  syncButtons(); renderRoster();
+}
+$('muteBtn').onclick = () => setMuted(!muted);
+$('deafBtn').onclick = () => {
+  deafened = !deafened;
+  applyMaster();
+  if (deafened) { mutedBeforeDeaf = muted; if (!muted) setMuted(true); }   // like Discord: deafening also mutes your mic
+  else if (!mutedBeforeDeaf) setMuted(false);                                // restore the mic to how it was
+  syncButtons();
+};
+$('master').oninput = e => { masterVol = e.target.value / 100; $('masterVal').textContent = e.target.value + '%'; applyMaster(); };
 $('msgForm').onsubmit = e => {
   e.preventDefault();
   const v = $('msgIn').value.trim(); if (!v) return;
@@ -297,16 +382,18 @@ $('msgForm').onsubmit = e => {
 };
 
 async function leave() {
-  talk(false);
   const path = roomPath, uid = me;
   roomPath = '';
+  clearInterval(meter); meter = null;
   unsubs.forEach(u => { try { u(); } catch {} }); unsubs = [];
   Object.keys(peers).forEach(closePeer);
   if (path && uid) await remove(ref(db, `${path}/peers/${uid}`)).catch(() => {});
   micStream?.getTracks().forEach(t => t.stop()); micStream = null;
-  known = {}; isOwner = false; delArmed = false;
+  try { actx?.close(); } catch {} actx = null; master = null; myAnalyser = null;
+  try { wake?.release(); } catch {} wake = null;
+  known = {}; isOwner = false; delArmed = false; muted = false; deafened = false;
   $('delBtn').textContent = 'Delete';
-  $('log').innerHTML = '';
+  $('log').innerHTML = ''; $('roster').innerHTML = '';
   $('app').style.display = 'none';
   $('join').style.display = 'block';
   $('joinBtn').disabled = false;
@@ -317,6 +404,12 @@ $('delBtn').onclick = async () => {
   try { await remove(ref(db, roomPath)); } catch { log('Could not delete the room.'); }
 };
 addEventListener('pagehide', () => { if (roomPath && me) remove(ref(db, `${roomPath}/peers/${me}`)); });
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible') {
+    try { if (roomPath && !wake) wake = await navigator.wakeLock?.request('screen'); } catch {}
+    actx?.resume().catch(() => {});
+  }
+});
 </script>
 </body>
 </html>
