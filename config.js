@@ -1,11 +1,10 @@
-// Paste your Firebase web app config here (Firebase console > Project settings > Your apps).
-// These values are public by design; the security rules protect the data.
+// Firebase web app config. These values are public by design; the database security rules protect the data.
 export const firebaseConfig = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-  databaseURL: "PASTE_DATABASE_URL",
-  projectId: "PASTE_PROJECT_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyCYiktPdEDCBzP-ERXXoicmurZ9Lycb8oc",
+  authDomain: "walkie-talkie-a5a88.firebaseapp.com",
+  databaseURL: "https://walkie-talkie-a5a88-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "walkie-talkie-a5a88",
+  appId: "1:508776519810:web:3338862fadebb314d33c9b"
 };
 
 // STUN works for most WiFi/home networks. Add a TURN server below if phones on
