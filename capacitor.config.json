@@ -1,0 +1,6 @@
+{
+  "appId": "com.sonu4y.walkietalkie",
+  "appName": "Voice Room",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}
