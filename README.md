@@ -22,3 +22,7 @@ Audio goes directly between devices (WebRTC). Firebase is only used for rooms, s
 - Microphone needs https (Vercel provides it).
 - Phones on different mobile carriers may need a TURN server (see `config.js`).
 - Built for small groups (about 2 to 8 people).
+
+## License
+
+Copyright (c) 2026 Vansh. All rights reserved. See [LICENSE](LICENSE).
