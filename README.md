@@ -25,4 +25,4 @@ Audio goes directly between devices (WebRTC). Firebase is only used for rooms, s
 
 ## License
 
-Copyright (c) 2026 Vansh. All rights reserved. See [LICENSE](LICENSE).
+Copyright (c) 2026 Vansh. Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE): free to use and modify for noncommercial purposes. Commercial use requires permission from the copyright holder.
