@@ -6,6 +6,7 @@ const perms = [
   'android.permission.RECORD_AUDIO',
   'android.permission.MODIFY_AUDIO_SETTINGS',
   'android.permission.WAKE_LOCK',
+  'android.permission.BLUETOOTH_CONNECT',
 ];
 const add = perms.filter(n => !x.includes(n)).map(n => `    <uses-permission android:name="${n}" />\n`).join('');
 x = x.replace('    <uses-permission android:name="android.permission.INTERNET" />', add + '    <uses-permission android:name="android.permission.INTERNET" />');
