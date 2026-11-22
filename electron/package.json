@@ -1,0 +1,22 @@
+{
+  "name": "voice-room-desktop",
+  "productName": "Voice Room",
+  "version": "1.0.0",
+  "description": "Private voice rooms",
+  "author": "Vansh",
+  "main": "main.js",
+  "private": true,
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.sonu4y.walkietalkie.desktop",
+    "productName": "Voice Room",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "www/**/*"],
+    "win": { "target": "nsis" },
+    "nsis": { "oneClick": true, "perMachine": false },
+    "artifactName": "VoiceRoom-Setup.${ext}"
+  }
+}
